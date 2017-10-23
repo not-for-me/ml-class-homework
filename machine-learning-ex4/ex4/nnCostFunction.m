@@ -71,6 +71,8 @@ y_v = bsxfun(@eq, y(:), 1:max(y));
 % 2*2의 sum은 처음엔 행을 sum: test 수의 sum
 % 두번째 sum은 column의 sum: class의 sum
 J = sum(sum( -y_v .* log(h2) - (1 - y_v) .* log(1 - h2) )) / m;
+regularization = (sum(sum(Theta1(:,2:end) .^ 2)) + sum(sum(Theta2(:,2:end) .^ 2))) * lambda / (2 * m);
+J  += regularization;
 
 % loop 버전
 % total = 0
