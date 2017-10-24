@@ -62,15 +62,19 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-h1 = sigmoid([ones(m, 1) X] * Theta1');
-h2 = sigmoid([ones(m, 1) h1] * Theta2');
+a_1 = [ones(m, 1) X];
+z_2 = a_1 * Theta1';
+a_2 = [ones(m, 1) sigmoid(z_2)];
+z_3 = a_2 * Theta2';
+a_3 = sigmoid(z_3);
+h = a_3;
 
 % one-hot encoding 하자
-y_v = bsxfun(@eq, y(:), 1:max(y));
+y_one_hot = bsxfun(@eq, y(:), 1:max(y));
 
 % 2*2의 sum은 처음엔 행을 sum: test 수의 sum
 % 두번째 sum은 column의 sum: class의 sum
-J = sum(sum( -y_v .* log(h2) - (1 - y_v) .* log(1 - h2) )) / m;
+J = sum(sum( -y_one_hot .* log(h) - (1 - y_one_hot) .* log(1 - h) )) / m;
 regularization = (sum(sum(Theta1(:,2:end) .^ 2)) + sum(sum(Theta2(:,2:end) .^ 2))) * lambda / (2 * m);
 J  += regularization;
 
@@ -84,11 +88,26 @@ J  += regularization;
 
 % J = total / m;
 
+% backpropagation
 
+for t=1:m
+    e_3 = a_3(t,:) - y_one_hot(t,:);
+    e_2 = (Theta2' * e_3')(2:end)' .* sigmoidGradient(z_2(t,:));
 
+    Theta2_grad += (e_3' * a_2(t,:));
+    Theta1_grad += (e_2' * a_1(t,:));
+end
 
+% non regularilized
+% Theta1_grad /= m;
+% Theta2_grad /= m;
 
+Theta1_grad = (Theta1_grad / m) + lambda * Theta1 / m;
+Theta2_grad = (Theta2_grad / m) + lambda * Theta2 / m;
 
+% remove from first
+Theta1_grad(:, 1) -= (lambda *Theta1(:,1) / m); 
+Theta2_grad(:, 1) -= (lambda *Theta2(:,1) / m);
 
 
 % -------------------------------------------------------------
