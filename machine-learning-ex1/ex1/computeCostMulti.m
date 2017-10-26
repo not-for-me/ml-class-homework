@@ -15,9 +15,10 @@ J = 0;
 
 hypothesis = X * theta;
 error = hypothesis - y;
-J = sum(error.^2) / (2 * m)
+J = sum(error.^2) / (2 * m);
 
-
+% vectorize 버전
+% J = (error' * error) / (2 * m);
 
 
 % =========================================================================
