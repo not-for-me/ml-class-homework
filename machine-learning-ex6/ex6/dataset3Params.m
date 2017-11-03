@@ -23,11 +23,29 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+last_error = intmax;
+result = [0, 0];
 
+candidates = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
+max_iter = length(candidates)
 
+for C_i=1:max_iter
+    for s_i=1:max_iter
+        model= svmTrain(X, y, candidates(C_i), @(x1, x2) gaussianKernel(x1, x2, candidates(s_i)));
+        
+        predictions = svmPredict(model, Xval); 
+        cur_error = mean(double(predictions ~= yval));
+        if (cur_error < last_error)
+            % fprintf('\n\nchanged cost: %f, C: %f, sigma: %f\n', cur_error, candidates(C_i), candidates(s_i));
+            result(1) = candidates(C_i);
+            result(2) = candidates(s_i);
+            last_error = cur_error;
+        endif
+    end
+end
 
-
-
+C = result(1)
+sigma = result(2)
 
 % =========================================================================
 
